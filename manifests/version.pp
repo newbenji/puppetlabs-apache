@@ -4,23 +4,25 @@
 #
 class apache::version {
   # This will be 5 or 6 on RedHat, 6 or wheezy on Debian, 12 or quantal on Ubuntu, etc.
-  $osr_array = split($::operatingsystemrelease,'[\/\.]')
+  $osr_array = split($::operatingsystemrelease, '[\/\.]')
   $distrelease = $osr_array[0]
-  if ! $distrelease {
+
+  if !$distrelease {
     fail("Class['apache::version']: Unparsable \$::operatingsystemrelease: ${::operatingsystemrelease}")
   }
 
   case $::osfamily {
-    'RedHat': {
-      if ($::operatingsystem == 'Amazon') {
-        $default = '2.2'
-      } elsif ($::operatingsystem == 'Fedora' and versioncmp($distrelease, '18') >= 0) or ($::operatingsystem != 'Fedora' and versioncmp($distrelease, '7') >= 0) {
+    'RedHat'  : {
+      if ($::operatingsystem == 'Amazon' and versioncmp($distrelease, "2")) {
+        $default = '2.4'
+      } elsif ($::operatingsystem == 'Fedora' and versioncmp($distrelease, '18') >= 0) or ($::operatingsystem != 'Fedora' and versioncmp($distrelease, '7') >= 0
+      ) {
         $default = '2.4'
       } else {
         $default = '2.2'
       }
     }
-    'Debian': {
+    'Debian'  : {
       if $::operatingsystem == 'Ubuntu' and versioncmp($::operatingsystemrelease, '13.10') >= 0 {
         $default = '2.4'
       } elsif $::operatingsystem == 'Debian' and versioncmp($distrelease, '8') >= 0 {
@@ -29,20 +31,20 @@ class apache::version {
         $default = '2.2'
       }
     }
-    'FreeBSD': {
+    'FreeBSD' : {
       $default = '2.4'
     }
-    'Gentoo': {
+    'Gentoo'  : {
       $default = '2.4'
     }
-    'Suse': {
+    'Suse'    : {
       if $::operatingsystem == 'SLES' and $::operatingsystemrelease >= '12' {
         $default = '2.4'
       } else {
         $default = '2.2'
       }
     }
-    default: {
+    default   : {
       fail("Class['apache::version']: Unsupported osfamily: ${::osfamily}")
     }
   }
